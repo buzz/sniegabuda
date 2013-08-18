@@ -36,7 +36,7 @@ void renderEffect01(byte idx);
 void renderEffect02(byte idx);
 void renderEffect03(byte idx);
 void renderEffectCircleFlow(byte idx);
-void renderEffectGroupTest(byte idx);
+void renderEffectStars(byte idx);
 void renderAlpha00(void);
 void renderAlpha01(void);
 void renderAlpha02(void);
@@ -51,8 +51,8 @@ void (*renderEffect[])(byte) = {
 //  renderEffect01
 //  renderEffect02,
 //  renderEffect03,
-//  renderEffectCircleFlow,
-  renderEffectGroupTest
+//  renderEffectCircleFlow
+  renderEffectStars
 },
 (*renderAlpha[])(void)  = {
   renderAlpha00,
@@ -146,7 +146,6 @@ void callback() {
   // Count up to next transition (or end of current one):
   tCounter++;
   if(tCounter == 0) { // Transition start
-		Serial.println("Transition started!");
     // Randomly pick next image effect and alpha effect indices:
     fxIdx[frontImgIdx] = random((sizeof(renderEffect) / sizeof(renderEffect[0])));
     fxIdx[2]           = random((sizeof(renderAlpha)  / sizeof(renderAlpha[0])));
@@ -397,19 +396,33 @@ void renderEffectCircleFlow(byte idx) {
   setRangeColor(idx, imgData, fifthCircle, r, g, b);
 }
 
-void renderEffectGroupTest(byte idx) {
+void renderEffectStars(byte idx) {
+  int hue_step = 5;
   if(fxVars[idx][0] == 0) { // Initialize effect?
-    long c = hsv2rgb(random(1536), random(130, 255), random(255));
-    int r = c >> 16, g = c >> 8, b = c;
-    int rand = random(3);
-    if (rand == 0)
-      setGroupColor(idx, imgData, starSmall, starSmallLength, r, g, b);
-    else if (rand == 1)
-      setGroupColor(idx, imgData, starMiddle, starMiddleLength, r, g, b);
-    else if (rand == 2)
-      setGroupColor(idx, imgData, Line1, Line1Length, r, g, b);
+		fxVars[idx][1] = random(3); // structure to show
+		fxVars[idx][2] = random(1536); // hue
+		fxVars[idx][3] = random(100,255); // sat
+		fxVars[idx][4] = random(120,255); // value
+    fxVars[idx][5] = 4 + random(10);   // hue speed
+    fxVars[idx][6] = random(2);   // hue direction
+
     fxVars[idx][0] = 1;   // Effect initialized
   }
+
+  // hue variation
+  if (random(fxVars[idx][5]) == 0) {
+    if (fxVars[idx][6] == 0) fxVars[idx][2] += hue_step;
+    else fxVars[idx][2] -= hue_step;
+  }
+
+	long c = hsv2rgb(fxVars[idx][2], fxVars[idx][3], fxVars[idx][4]);
+	int r = c >> 16, g = c >> 8, b = c;
+	if (fxVars[idx][1] == 0)
+		setGroupColor(idx, imgData, starSmall, starSmallLength, r, g, b);
+	else if (fxVars[idx][1] == 1)
+		setGroupColor(idx, imgData, starMiddle, starMiddleLength, r, g, b);
+	else if (fxVars[idx][1] == 2)
+		setGroupColor(idx, imgData, starBig, starBigLength, r, g, b);
 }
 
 // TO DO: Add more effects here...Larson scanner, etc.
