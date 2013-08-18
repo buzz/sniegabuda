@@ -57,10 +57,10 @@ void (*renderEffect[])(byte) = {
 },
 (*renderAlpha[])(void)  = {
   /* renderAlphaSimpleFade, */
-	renderAlphaSinusSchlange,
+	/* renderAlphaSinusSchlange, */
   /* renderAlphaPixelForPixel, */
-  renderAlphaSinusWobbler,
-  renderAlphaSparkle
+  renderAlphaSinusWobbler
+  /* renderAlphaSparkle */
 };
 
 // ---------------------------------------------------------------------------
@@ -498,7 +498,7 @@ void renderAlphaPixelForPixel(void) {
 void renderAlphaSinusWobbler(void) {
   if(fxVars[2][0] == 0) {
 		fxVars[2][0] = 1;
-		fxVars[2][1] = random(3);
+		fxVars[2][1] = random(6);
 	}
 
 	float t = (float)tCounter / (float)transitionTime;
