@@ -1,5 +1,5 @@
-#ifndef UTILS_c
-#define UTILS_c
+#ifndef UTILS_cpp
+#define UTILS_cpp
 
 #include <pgmspace.h>
 

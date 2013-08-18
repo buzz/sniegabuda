@@ -1,22 +1,3 @@
-// THIS PROGRAM *WILL* *NOT* *WORK* ON REALLY LONG LED STRIPS.  IT USES
-// AN INORDINATE AMOUNT OF RAM IN ORDER TO ACHIEVE ITS BUTTERY-SMOOTH
-// ANIMATION.  See the 'strandtest' sketch for a simpler and less RAM-
-// intensive example that can process more LEDs (100+).
-
-// Example to control LPD8806-based RGB LED Modules in a strip; originally
-// intended for the Adafruit Digital Programmable LED Belt Kit.
-// REQUIRES TIMER1 LIBRARY: http://www.arduino.cc/playground/Code/Timer1
-// ALSO REQUIRES LPD8806 LIBRARY, which should be included with this code.
-
-// I'm generally not fond of canned animation patterns.  Wanting something
-// more nuanced than the usual 8-bit beep-beep-boop-boop pixelly animation,
-// this program smoothly cycles through a set of procedural animated effects
-// and transitions -- it's like a Video Toaster for your waist!  Some of the
-// coding techniques may be a bit obtuse (e.g. function arrays), so novice
-// programmers may have an easier time starting out with the 'strandtest'
-// program also included with the LPD8806 library.
-
-#include <Arduino.h>
 #include <pgmspace.h>
 #include "SPI.h"
 #include "LPD8806.h"
@@ -24,6 +5,7 @@
 
 #include "Constants.h"
 #include "Utils.h"
+#include "Geo.h"
 
 
 // Hardware SPI for ultra-fast writes
@@ -46,27 +28,6 @@ byte imgData[2][numPixels * 3], // Data for 2 strips worth of imagery
 int  fxVars[3][50],             // Effect instance variables (explained later)
      tCounter   = -1,           // Countdown to next transition
      transitionTime;            // Duration (in frames) of current transition
-
-// ---------------------------------------------------------------------------
-// Lines
-static const uint8_t PROGMEM firstCircle[] = {0, 29};
-static const uint8_t PROGMEM secondCircle[] = {30, 59};
-static const uint8_t PROGMEM thirdCircle[] = {60,84};
-static const uint8_t PROGMEM fourthCircle[] = {85,99};
-static const uint8_t PROGMEM fifthCircle[] = {100,104};
-
-// ---------------------------------------------------------------------------
-// Groups
-static const uint8_t PROGMEM starSmall[] = {87,90,93,96,99,100,101,102,103,104};
-static const uint8_t starSmallLength = 10;
-
-static const uint8_t PROGMEM starMiddle[] = {
-  33,39,45,51,57,62,63,64,67,68,69,72,73,74,77,78,79,82,83,84,85,86,87,88,89,90,91,
-  92,93,94,95,96,97,98,99,100,101,102,103,104};
-static const uint8_t starMiddleLength = 40;
-
-static const uint8_t PROGMEM Line1[] = {0,29,30,59,60,84,85,99,100,104,103,93,92,72,71,43,42,11,10};
-static const uint8_t Line1Length = 19;
 
 
 // function prototypes, leave these be :)
@@ -120,7 +81,7 @@ void setup() {
   // the timer allows smooth transitions between effects (otherwise the
   // effects and transitions would jump around in speed...not attractive).
   Timer1.initialize();
-  Timer1.attachInterrupt(callback, 1000000 / 40); // 60 frames/second
+  Timer1.attachInterrupt(callback, 1000000 / 60); // 60 frames/second
 }
 
 void loop() {
@@ -516,7 +477,3 @@ void renderAlpha02(void) {
     else                      alphaMask[i] = 0;
   }
 }
-
-// TO DO: Add more transitions here...triangle wave reveal, etc.
-
-
