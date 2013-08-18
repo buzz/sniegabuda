@@ -41,30 +41,32 @@ void renderAlpha00(void);
 void renderAlpha01(void);
 void renderAlpha02(void);
 void renderAlpha03(void);
+void renderAlphaSinusWobbler(void);
 void callback();
 
 // List of image effect and alpha channel rendering functions; the code for
 // each of these appears later in this file.  Just a few to start with...
 // simply append new ones to the appropriate list here:
 void (*renderEffect[])(byte) = {
-//  renderEffect00,
+  renderEffect00
 //  renderEffect01
-//  renderEffect02,
-//  renderEffect03,
-//  renderEffectCircleFlow
-  renderEffectStars
+  /* renderEffect02, */
+  /* renderEffect03, */
+  /* renderEffectCircleFlow, */
+  /* renderEffectStars */
 },
 (*renderAlpha[])(void)  = {
-  renderAlpha00,
-  renderAlpha01
-//  renderAlpha02
+  /* renderAlpha00, */
+	/* renderAlpha01, */
+  /* renderAlpha02, */
+  renderAlphaSinusWobbler
 };
 
 // ---------------------------------------------------------------------------
 
 void setup() {
-	Serial.begin(9600);
-	Serial.println("Transition started!");
+	/* Serial.begin(115200); */
+	/* Serial.println("Transition started!"); */
 
   // Start up the LED strip.  Note that strip.show() is NOT called here --
   // the callback function will be invoked immediately when attached, and
@@ -150,13 +152,14 @@ void callback() {
     fxIdx[frontImgIdx] = random((sizeof(renderEffect) / sizeof(renderEffect[0])));
     fxIdx[2]           = random((sizeof(renderAlpha)  / sizeof(renderAlpha[0])));
     transitionTime     = random(1*60, 4*60);
-//    transitionTime     = 600;
+//    transitionTime     = 2*60;
     fxVars[frontImgIdx][0] = 0; // Effect not yet initialized
     fxVars[2][0]           = 0; // Transition not yet initialized
   } else if(tCounter >= transitionTime) { // End transition
     fxIdx[backImgIdx] = fxIdx[frontImgIdx]; // Move front effect index to back
     backImgIdx        = 1 - backImgIdx;     // Invert back index
     tCounter          = -2*60 - random(2*60); // Hold image 2 to 6 seconds
+    /* tCounter          = 6*60; // Hold image 2 to 6 seconds */
   }
 }
 
@@ -489,4 +492,22 @@ void renderAlpha02(void) {
     else if(reverse < hiWord) alphaMask[i] = 255;
     else                      alphaMask[i] = 0;
   }
+}
+
+// Group mask
+void renderAlphaSinusWobbler(void) {
+  if(fxVars[2][0] == 0) {
+		fxVars[2][0] = 1;
+		fxVars[2][1] = random(3);
+	}
+
+	float t = (float)tCounter / (float)transitionTime;
+	float t_inv = 1. - t;
+
+	int i, x = t * 360 * 3 * fxVars[2][1];
+	int s = fixSin(x - 180) + 127;
+	int a = (int)(s * t_inv) + (int)(t * 255);
+	for(i=0; i<numPixels; i++) {
+		alphaMask[i] = a;
+	}
 }
