@@ -31,16 +31,15 @@ int  fxVars[3][50],             // Effect instance variables (explained later)
 
 
 // function prototypes, leave these be :)
-void renderEffect00(byte idx);
-void renderEffect01(byte idx);
-void renderEffect02(byte idx);
-void renderEffect03(byte idx);
+void renderEffectSimpleFill(byte idx);
+void renderEffectRainbow(byte idx);
+void renderEffectWaveChase(byte idx);
+void renderEffectWavyFlag(byte idx);
 void renderEffectCircleFlow(byte idx);
 void renderEffectStars(byte idx);
-void renderAlpha00(void);
-void renderAlpha01(void);
-void renderAlpha02(void);
-void renderAlpha03(void);
+void renderAlphaSimpleFade(void);
+void renderAlphaSinusSchlange(void);
+void renderAlphaPixelForPixel(void);
 void renderAlphaSinusWobbler(void);
 void callback();
 
@@ -48,17 +47,17 @@ void callback();
 // each of these appears later in this file.  Just a few to start with...
 // simply append new ones to the appropriate list here:
 void (*renderEffect[])(byte) = {
-  renderEffect00
-//  renderEffect01
-  /* renderEffect02, */
-  /* renderEffect03, */
+  renderEffectSimpleFill
+//  renderEffectRainbow
+  /* renderEffectWaveChase, */
+  /* renderEffectWavyFlag, */
   /* renderEffectCircleFlow, */
   /* renderEffectStars */
 },
 (*renderAlpha[])(void)  = {
-  /* renderAlpha00, */
-	/* renderAlpha01, */
-  /* renderAlpha02, */
+  /* renderAlphaSimpleFade, */
+	/* renderAlphaSinusSchlange, */
+  /* renderAlphaPixelForPixel, */
   renderAlphaSinusWobbler
 };
 
@@ -179,7 +178,7 @@ void callback() {
 // indexes, are automatically carried with them.
 
 // Simplest rendering effect: fill entire image with solid color
-void renderEffect00(byte idx) {
+void renderEffectSimpleFill(byte idx) {
   // Only needs to be rendered once, when effect is initialized:
   if(fxVars[idx][0] == 0) {
     byte *ptr = &imgData[idx][0],
@@ -194,7 +193,7 @@ void renderEffect00(byte idx) {
 // Rainbow effect (1 or more full loops of color wheel at 100% saturation).
 // Not a big fan of this pattern (it's way overused with LED stuff), but it's
 // practically part of the Geneva Convention by now.
-void renderEffect01(byte idx) {
+void renderEffectRainbow(byte idx) {
   if(fxVars[idx][0] == 0) { // Initialize effect?
     // Number of repetitions (complete loops around color wheel); any
     // more than 4 per meter just looks too chaotic and un-rainbow-like.
@@ -222,7 +221,7 @@ void renderEffect01(byte idx) {
 }
 
 // Sine wave chase effect
-void renderEffect02(byte idx) {
+void renderEffectWaveChase(byte idx) {
   if(fxVars[idx][0] == 0) { // Initialize effect?
     fxVars[idx][1] = random(1536); // Random hue
     // Number of repetitions (complete loops around color wheel);
@@ -268,7 +267,7 @@ static const uint8_t PROGMEM flagTable[]  = {
   C_WHITE, C_RED  , C_WHITE, C_RED  , C_WHITE, C_RED };
 
 // Wavy flag effect
-void renderEffect03(byte idx) {
+void renderEffectWavyFlag(byte idx) {
   long i, sum, s, x;
   int  idx1, idx2, a, b;
   if(fxVars[idx][0] == 0) { // Initialize effect?
@@ -440,13 +439,13 @@ void renderEffectStars(byte idx) {
 // for each, a third row of fxVars is used for this information.
 
 // Simplest alpha effect: fade entire strip over duration of transition.
-void renderAlpha00(void) {
+void renderAlphaSimpleFade(void) {
   byte fade = 255L * tCounter / transitionTime;
   for(int i=0; i<numPixels; i++) alphaMask[i] = fade;
 }
 
 // Straight left-to-right or right-to-left wipe
-void renderAlpha01(void) {
+void renderAlphaSinusSchlange(void) {
   long x, y, b;
   if(fxVars[2][0] == 0) {
     fxVars[2][1] = random(1, numPixels); // run, in pixels
@@ -468,7 +467,7 @@ void renderAlpha01(void) {
 }
 
 // Dither reveal between images
-void renderAlpha02(void) {
+void renderAlphaPixelForPixel(void) {
   long fade;
   int  i, bit, reverse, hiWord;
 
