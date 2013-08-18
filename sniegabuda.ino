@@ -41,24 +41,26 @@ void renderAlphaSimpleFade(void);
 void renderAlphaSinusSchlange(void);
 void renderAlphaPixelForPixel(void);
 void renderAlphaSinusWobbler(void);
+void renderAlphaSparkle(void);
 void callback();
 
 // List of image effect and alpha channel rendering functions; the code for
 // each of these appears later in this file.  Just a few to start with...
 // simply append new ones to the appropriate list here:
 void (*renderEffect[])(byte) = {
-  renderEffectSimpleFill
+  /* renderEffectSimpleFill */
 //  renderEffectRainbow
-  /* renderEffectWaveChase, */
+  renderEffectWaveChase,
   /* renderEffectWavyFlag, */
-  /* renderEffectCircleFlow, */
-  /* renderEffectStars */
+  renderEffectCircleFlow,
+  renderEffectStars
 },
 (*renderAlpha[])(void)  = {
   /* renderAlphaSimpleFade, */
-	/* renderAlphaSinusSchlange, */
+	renderAlphaSinusSchlange,
   /* renderAlphaPixelForPixel, */
-  renderAlphaSinusWobbler
+  renderAlphaSinusWobbler,
+  renderAlphaSparkle
 };
 
 // ---------------------------------------------------------------------------
@@ -150,14 +152,14 @@ void callback() {
     // Randomly pick next image effect and alpha effect indices:
     fxIdx[frontImgIdx] = random((sizeof(renderEffect) / sizeof(renderEffect[0])));
     fxIdx[2]           = random((sizeof(renderAlpha)  / sizeof(renderAlpha[0])));
-    transitionTime     = random(1*60, 4*60);
+    transitionTime     = random(4*60, 6*60);
 //    transitionTime     = 2*60;
     fxVars[frontImgIdx][0] = 0; // Effect not yet initialized
     fxVars[2][0]           = 0; // Transition not yet initialized
   } else if(tCounter >= transitionTime) { // End transition
     fxIdx[backImgIdx] = fxIdx[frontImgIdx]; // Move front effect index to back
     backImgIdx        = 1 - backImgIdx;     // Invert back index
-    tCounter          = -2*60 - random(2*60); // Hold image 2 to 6 seconds
+    tCounter          = -3*60 - random(3*60); // Hold image 2 to 6 seconds
     /* tCounter          = 6*60; // Hold image 2 to 6 seconds */
   }
 }
@@ -493,7 +495,6 @@ void renderAlphaPixelForPixel(void) {
   }
 }
 
-// Group mask
 void renderAlphaSinusWobbler(void) {
   if(fxVars[2][0] == 0) {
 		fxVars[2][0] = 1;
@@ -508,5 +509,19 @@ void renderAlphaSinusWobbler(void) {
 	int a = (int)(s * t_inv) + (int)(t * 255);
 	for(i=0; i<numPixels; i++) {
 		alphaMask[i] = a;
+	}
+}
+
+void renderAlphaSparkle(void) {
+  if(fxVars[2][0] == 0) {
+		fxVars[2][0] = 1;
+		fxVars[2][1] = random(160, 254); // sparkle strength
+	}
+
+	float t = (float)tCounter / (float)transitionTime;
+	float t_inv = 1. - t;
+	int i, r = (int)(t * (float)fxVars[2][1]);
+	for(i=0; i<numPixels; i++) {
+		alphaMask[i] = (int)(random(r) * t_inv) + (int)(t * 255);
 	}
 }
