@@ -35,7 +35,7 @@ void renderEffectSimpleFill(byte idx);
 void renderEffectRainbow(byte idx);
 void renderEffectWaveChase(byte idx);
 void renderEffectWavyFlag(byte idx);
-void renderEffectCircleFlow(byte idx);
+void renderEffectRingFlow(byte idx);
 void renderEffectPent(byte idx);
 void renderEffectStars(byte idx);
 void renderAlphaSimpleFade(void);
@@ -53,7 +53,7 @@ void (*renderEffect[])(byte) = {
 //  renderEffectRainbow
   renderEffectWaveChase,
   /* /\* renderEffectWavyFlag, *\/ */
-  /* renderEffectCircleFlow, */
+  /* renderEffectRingFlow, */
 	/* renderEffectPent, */
 	/* renderEffectStars */
 },
@@ -307,7 +307,7 @@ void renderEffectWavyFlag(byte idx) {
   if(fxVars[idx][4] >= 720) fxVars[idx][4] -= 720;
 }
 
-void renderEffectCircleFlow(byte idx) {
+void renderEffectRingFlow(byte idx) {
   long c;
   int r, g, b, min_value = 125, min_sat = 150, hue_step = 5;
   if(fxVars[idx][0] == 0) { // Initialize effect?
@@ -383,23 +383,23 @@ void renderEffectCircleFlow(byte idx) {
 
   c = hsv2rgb(fxVars[idx][1], fxVars[idx][9], fxVars[idx][6]);
   r = c >> 16, g = c >> 8, b = c;
-  setRangeColor(idx, imgData, firstCircle, r, g, b);
+  setRangeColor(idx, imgData, ring1, r, g, b);
 
   c = hsv2rgb(fxVars[idx][2], fxVars[idx][9], fxVars[idx][6]);
   r = c >> 16, g = c >> 8, b = c;
-  setRangeColor(idx, imgData, secondCircle, r, g, b);
+  setRangeColor(idx, imgData, ring2, r, g, b);
 
   c = hsv2rgb(fxVars[idx][3], fxVars[idx][9], fxVars[idx][6]);
   r = c >> 16, g = c >> 8, b = c;
-  setRangeColor(idx, imgData, thirdCircle, r, g, b);
+  setRangeColor(idx, imgData, ring3, r, g, b);
 
   c = hsv2rgb(fxVars[idx][4], fxVars[idx][9], fxVars[idx][6]);
   r = c >> 16, g = c >> 8, b = c;
-  setRangeColor(idx, imgData, fourthCircle, r, g, b);
+  setRangeColor(idx, imgData, ring4, r, g, b);
 
   c = hsv2rgb(fxVars[idx][5], fxVars[idx][9], fxVars[idx][6]);
   r = c >> 16, g = c >> 8, b = c;
-  setRangeColor(idx, imgData, fifthCircle, r, g, b);
+  setRangeColor(idx, imgData, ring5, r, g, b);
 }
 
 void renderEffectPent(byte idx) {
