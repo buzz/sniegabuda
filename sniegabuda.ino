@@ -25,8 +25,8 @@ byte imgData[2][numPixels * 3], // Data for 2 strips worth of imagery
      alphaMask[numPixels],      // Alpha channel for compositing images
      backImgIdx = 0,            // Index of 'back' image (always 0 or 1)
      fxIdx[3];                  // Effect # for back & front images + alpha
-int  fxVars[3][50],             // Effect instance variables (explained later)
-     tCounter   = -1,           // Countdown to next transition
+int  fxVars[3][50];             // Effect instance variables (explained later)
+long tCounter   = -1,           // Countdown to next transition
      transitionTime;            // Duration (in frames) of current transition
 
 
@@ -49,20 +49,20 @@ void callback();
 // each of these appears later in this file.  Just a few to start with...
 // simply append new ones to the appropriate list here:
 void (*renderEffect[])(byte) = {
-  renderEffectSimpleFill,
+//  renderEffectSimpleFill,
 //  renderEffectRainbow
   renderEffectWaveChase,
-  /* renderEffectWavyFlag, */
-  renderEffectCircleFlow,
-	renderEffectPent,
-	renderEffectStars
+  /* /\* renderEffectWavyFlag, *\/ */
+  /* renderEffectCircleFlow, */
+	/* renderEffectPent, */
+	/* renderEffectStars */
 },
 (*renderAlpha[])(void)  = {
-  /* renderAlphaSimpleFade, */
-	renderAlphaSinusSchlange,
+  renderAlphaSimpleFade
+	/* renderAlphaSinusSchlange, */
   /* renderAlphaPixelForPixel, */
-  renderAlphaSinusWobbler,
-  renderAlphaSparkle
+  /* renderAlphaSinusWobbler, */
+  /* renderAlphaSparkle */
 };
 
 // ---------------------------------------------------------------------------
@@ -86,7 +86,7 @@ void setup() {
   // the timer allows smooth transitions between effects (otherwise the
   // effects and transitions would jump around in speed...not attractive).
   Timer1.initialize();
-  Timer1.attachInterrupt(callback, 1000000 / 60); // 60 frames/second
+  Timer1.attachInterrupt(callback, 1000000 / 30); // 60 frames/second
 }
 
 void loop() {
@@ -154,15 +154,15 @@ void callback() {
     // Randomly pick next image effect and alpha effect indices:
     fxIdx[frontImgIdx] = random((sizeof(renderEffect) / sizeof(renderEffect[0])));
     fxIdx[2]           = random((sizeof(renderAlpha)  / sizeof(renderAlpha[0])));
-    transitionTime     = random(4*60, 6*60);
-//    transitionTime     = 2*60;
+    /* transitionTime     = random(4*60, 6*60); */
+		transitionTime     = 120;
     fxVars[frontImgIdx][0] = 0; // Effect not yet initialized
     fxVars[2][0]           = 0; // Transition not yet initialized
   } else if(tCounter >= transitionTime) { // End transition
     fxIdx[backImgIdx] = fxIdx[frontImgIdx]; // Move front effect index to back
     backImgIdx        = 1 - backImgIdx;     // Invert back index
-    tCounter          = -3*60 - random(3*60); // Hold image 2 to 6 seconds
-    /* tCounter          = 6*60; // Hold image 2 to 6 seconds */
+    /* tCounter          = -3*60 - random(3*60); // Hold image 2 to 6 seconds */
+    tCounter          = -120;
   }
 }
 
@@ -235,7 +235,7 @@ void renderEffectWaveChase(byte idx) {
     // Frame-to-frame increment (speed) -- may be positive or negative,
     // but magnitude shouldn't be so small as to be boring.  It's generally
     // still less than a full pixel per frame, making motion very smooth.
-    fxVars[idx][3] = 1 + random(fxVars[idx][1]) / numPixels;
+    fxVars[idx][3] = 1 + random(fxVars[idx][1] / 12) / numPixels;
     // Reverse direction half the time.
     if(random(2) == 0) fxVars[idx][3] = -fxVars[idx][3];
     fxVars[idx][4] = 0; // Current position
@@ -247,7 +247,7 @@ void renderEffectWaveChase(byte idx) {
   long color;
   for(long i=0; i<numPixels; i++) {
     foo = fixSin(fxVars[idx][4] + fxVars[idx][2] * i / numPixels);
-    // Peaks of sine wave are white, troughs are black, mid-range
+    // Peaks of sine wave are colored, troughs are black, mid-range
     // values are pure hue (100% saturated).
     color = (foo >= 0) ?
        hsv2rgb(fxVars[idx][1], 254 - (foo * 2), 255) :
@@ -407,7 +407,7 @@ void renderEffectPent(byte idx) {
   int r, g, b, min_value = 125, min_sat = 150, hue_step = 5;
 
   if(fxVars[idx][0] == 0) { // Initialize effect?
-    int step1 = 50 + random(250), step2 = random(150);
+    int step1 = 20 + random(60), step2 = random(10,50);
     fxVars[idx][1] = random(1536);   // p center hue
     fxVars[idx][2] = fxVars[idx][1] + step1;   // p2 hue
     fxVars[idx][3] = fxVars[idx][1] + step2;   // p3 hue
@@ -620,7 +620,7 @@ void renderAlphaSinusWobbler(void) {
 void renderAlphaSparkle(void) {
   if(fxVars[2][0] == 0) {
 		fxVars[2][0] = 1;
-		fxVars[2][1] = random(160, 254); // sparkle strength
+		fxVars[2][1] = random(40, 70); // sparkle strength
 	}
 
 	float t = (float)tCounter / (float)transitionTime;
