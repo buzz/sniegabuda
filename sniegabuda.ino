@@ -36,6 +36,7 @@ void renderEffectRainbow(byte idx);
 void renderEffectWaveChase(byte idx);
 void renderEffectWavyFlag(byte idx);
 void renderEffectCircleFlow(byte idx);
+void renderEffectPent(byte idx);
 void renderEffectStars(byte idx);
 void renderAlphaSimpleFade(void);
 void renderAlphaSinusSchlange(void);
@@ -48,19 +49,20 @@ void callback();
 // each of these appears later in this file.  Just a few to start with...
 // simply append new ones to the appropriate list here:
 void (*renderEffect[])(byte) = {
-  /* renderEffectSimpleFill */
+  renderEffectSimpleFill,
 //  renderEffectRainbow
   renderEffectWaveChase,
   /* renderEffectWavyFlag, */
   renderEffectCircleFlow,
-  renderEffectStars
+	renderEffectPent,
+	renderEffectStars
 },
 (*renderAlpha[])(void)  = {
   /* renderAlphaSimpleFade, */
-	/* renderAlphaSinusSchlange, */
+	renderAlphaSinusSchlange,
   /* renderAlphaPixelForPixel, */
-  renderAlphaSinusWobbler
-  /* renderAlphaSparkle */
+  renderAlphaSinusWobbler,
+  renderAlphaSparkle
 };
 
 // ---------------------------------------------------------------------------
@@ -398,6 +400,109 @@ void renderEffectCircleFlow(byte idx) {
   c = hsv2rgb(fxVars[idx][5], fxVars[idx][9], fxVars[idx][6]);
   r = c >> 16, g = c >> 8, b = c;
   setRangeColor(idx, imgData, fifthCircle, r, g, b);
+}
+
+void renderEffectPent(byte idx) {
+  long c;
+  int r, g, b, min_value = 125, min_sat = 150, hue_step = 5;
+
+  if(fxVars[idx][0] == 0) { // Initialize effect?
+    int step1 = 50 + random(250), step2 = random(150);
+    fxVars[idx][1] = random(1536);   // p center hue
+    fxVars[idx][2] = fxVars[idx][1] + step1;   // p2 hue
+    fxVars[idx][3] = fxVars[idx][1] + step2;   // p3 hue
+    fxVars[idx][4] = fxVars[idx][1] + step1*2;   // p4 hue
+    fxVars[idx][5] = fxVars[idx][3] + step2;   // p5 hue
+    fxVars[idx][6] = fxVars[idx][3] + step2*2;   // p5 hue
+
+    fxVars[idx][7] = 255 - random(255 - min_value);   // value
+    fxVars[idx][8] = 1 + random(5);   // value speed
+    fxVars[idx][9] = random(2);   // value direction
+
+    fxVars[idx][10] = 255 - random(255 - min_sat);   // saturation
+    fxVars[idx][11] = 1 + random(5);   // sat speed
+    fxVars[idx][12] = random(2);   // sat direction
+
+    fxVars[idx][13] = random(15);   // hue speed
+    fxVars[idx][14] = random(2);   // hue direction
+
+    fxVars[idx][0] = 1;   // Effect initialized
+  }
+
+  // value variation
+  if (random(fxVars[idx][8]) == 0) {
+    if (fxVars[idx][9] == 0)
+      fxVars[idx][7] -= 1;
+    else
+      fxVars[idx][7] += 1;
+  }
+  if (fxVars[idx][7] > 254) {
+    fxVars[idx][8] = 1 + random(5);
+    fxVars[idx][9] = 0;
+  }
+  else if (fxVars[idx][7] < min_value) {
+    fxVars[idx][8] = 1 + random(5);
+    fxVars[idx][9] = 1;
+  }
+
+  // sat variation
+  if (random(fxVars[idx][11]) == 0) {
+    if (fxVars[idx][12] == 0)
+      fxVars[idx][10] -= 1;
+    else
+      fxVars[idx][10] += 1;
+  }
+  if (fxVars[idx][10] > 254) {
+    fxVars[idx][11] = 1 + random(5);
+    fxVars[idx][12] = 0;
+  }
+  else if (fxVars[idx][10] < min_sat) {
+    fxVars[idx][11] = 1 + random(5);
+    fxVars[idx][12] = 1;
+  }
+
+  // hue variation
+  if (random(fxVars[idx][13]) == 0) {
+    if (fxVars[idx][14] == 0) {
+      fxVars[idx][1] += hue_step;
+      fxVars[idx][2] += hue_step;
+      fxVars[idx][3] += hue_step;
+      fxVars[idx][4] += hue_step;
+      fxVars[idx][5] += hue_step;
+      fxVars[idx][6] += hue_step;
+    } else {
+      fxVars[idx][1] -= hue_step;
+      fxVars[idx][2] -= hue_step;
+      fxVars[idx][3] -= hue_step;
+      fxVars[idx][4] -= hue_step;
+      fxVars[idx][5] -= hue_step;
+      fxVars[idx][6] -= hue_step;
+    }
+  }
+
+  c = hsv2rgb(fxVars[idx][1], fxVars[idx][10], fxVars[idx][7]);
+  r = c >> 16, g = c >> 8, b = c;
+	setGroupColor(idx, imgData, pentCenter, pentCenterLength, r, g, b);
+
+  c = hsv2rgb(fxVars[idx][2], fxVars[idx][10], fxVars[idx][7]);
+  r = c >> 16, g = c >> 8, b = c;
+	setGroupColor(idx, imgData, pent1, pent1Length, r, g, b);
+
+  c = hsv2rgb(fxVars[idx][3], fxVars[idx][10], fxVars[idx][7]);
+  r = c >> 16, g = c >> 8, b = c;
+	setGroupColor(idx, imgData, pent2, pent2Length, r, g, b);
+
+  c = hsv2rgb(fxVars[idx][4], fxVars[idx][10], fxVars[idx][7]);
+  r = c >> 16, g = c >> 8, b = c;
+	setGroupColor(idx, imgData, pent3, pent3Length, r, g, b);
+
+  c = hsv2rgb(fxVars[idx][5], fxVars[idx][10], fxVars[idx][7]);
+  r = c >> 16, g = c >> 8, b = c;
+	setGroupColor(idx, imgData, pent4, pent4Length, r, g, b);
+
+  c = hsv2rgb(fxVars[idx][6], fxVars[idx][10], fxVars[idx][7]);
+  r = c >> 16, g = c >> 8, b = c;
+	setGroupColor(idx, imgData, pent5, pent5Length, r, g, b);
 }
 
 void renderEffectStars(byte idx) {

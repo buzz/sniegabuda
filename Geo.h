@@ -27,4 +27,22 @@ static const uint8_t PROGMEM starBig[] = {
 };
 static const uint8_t starBigLength = 85;
 
+static const uint8_t PROGMEM pentCenter[] = {100,101,102,103,104};
+static const uint8_t pentCenterLength = 5;
+
+static const uint8_t PROGMEM pent1[] = {41,42,43,70,71};
+static const uint8_t pent1Length = 5;
+
+static const uint8_t PROGMEM pent2[] = {35,36,37,65,66};
+static const uint8_t pent2Length = 5;
+
+static const uint8_t PROGMEM pent3[] = {30,31,59,60,61};
+static const uint8_t pent3Length = 5;
+
+static const uint8_t PROGMEM pent4[] = {53,54,55,80,81};
+static const uint8_t pent4Length = 5;
+
+static const uint8_t PROGMEM pent5[] = {47,48,49,75,76};
+static const uint8_t pent5Length = 5;
+
 #endif
