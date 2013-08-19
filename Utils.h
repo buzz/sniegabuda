@@ -13,6 +13,8 @@ char fixSin(int angle);
 char fixCos(int angle);
 void setRangeColor(byte idx, byte imgData[2][numPixels * 3], const uint8_t *range, uint8_t r, uint8_t g, uint8_t b);
 void setGroupColor(byte idx, byte imgData[2][numPixels * 3], const uint8_t *group, int length, uint8_t r, uint8_t g, uint8_t b);
+void setRangeAlpha(byte buffer[numPixels], const uint8_t *range, uint8_t a);
+void setGroupAlpha(byte buffer[numPixels], const uint8_t *group, int length, uint8_t a);
 
 // Gamma correction compensates for our eyes' nonlinear perception of
 // intensity.  It's the LAST step before a pixel value is stored, and

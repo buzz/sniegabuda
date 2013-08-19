@@ -94,5 +94,19 @@ void setGroupColor(byte idx, byte imgData[2][numPixels * 3],
   }
 }
 
-#endif
+// Set range of pixels (alpha)
+void setRangeAlpha(byte buffer[numPixels], const uint8_t *range, uint8_t a) {
+  int i, begin = pgm_read_byte(&range[0]), end = pgm_read_byte(&range[1]);
+  for(i=begin; i<=end; i++)
+    buffer[i] = a;
+}
 
+// Set group of pixels (alpha)
+void setGroupAlpha(byte buffer[numPixels], const uint8_t *group, int length,
+									 uint8_t a) {
+  int i;
+  for(i=0; i<length; i++)
+    buffer[pgm_read_byte(&group[i])] = a;
+}
+
+#endif

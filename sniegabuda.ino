@@ -45,33 +45,36 @@ void renderAlphaSinusSchlange(void);
 void renderAlphaPixelForPixel(void);
 void renderAlphaSinusWobbler(void);
 void renderAlphaSparkle(void);
+void renderAlphaSwipe(void);
+void renderAlphaCentricSwipe(void);
 void callback();
 
 // List of image effect and alpha channel rendering functions; the code for
 // each of these appears later in this file.  Just a few to start with...
 // simply append new ones to the appropriate list here:
 void (*renderEffect[])(byte) = {
-//  renderEffectSimpleFill,
+ /* renderEffectSimpleFill */
 //  renderEffectRainbow
   renderEffectWaveChase,
-  /* /\* renderEffectWavyFlag, *\/ */
-  /* renderEffectRingFlow, */
-	/* renderEffectPent, */
-	/* renderEffectStars */
+  /* renderEffectWavyFlag, */
+  renderEffectRingFlow,
+	renderEffectPent,
+	renderEffectStars
 },
 (*renderAlpha[])(void)  = {
-  renderAlphaSimpleFade
-	/* renderAlphaSinusSchlange, */
+  /* renderAlphaSimpleFade */
+	renderAlphaSinusSchlange,
   /* renderAlphaPixelForPixel, */
-  /* renderAlphaSinusWobbler, */
-  /* renderAlphaSparkle */
+  renderAlphaSinusWobbler,
+  renderAlphaSparkle,
+	renderAlphaSwipe,
+	renderAlphaCentricSwipe
 };
 
 // ---------------------------------------------------------------------------
 
 void setup() {
-	/* Serial.begin(115200); */
-	/* Serial.println("Transition started!"); */
+	Serial.begin(115200);
 
   // Start up the LED strip.  Note that strip.show() is NOT called here --
   // the callback function will be invoked immediately when attached, and
@@ -88,7 +91,7 @@ void setup() {
   // the timer allows smooth transitions between effects (otherwise the
   // effects and transitions would jump around in speed...not attractive).
   Timer1.initialize();
-  Timer1.attachInterrupt(callback, 1000000 / 30); // 60 frames/second
+  Timer1.attachInterrupt(callback, 1000000 / 60); // frames/second
 }
 
 void loop() {
@@ -156,15 +159,15 @@ void callback() {
     // Randomly pick next image effect and alpha effect indices:
     fxIdx[frontImgIdx] = random((sizeof(renderEffect) / sizeof(renderEffect[0])));
     fxIdx[2]           = random((sizeof(renderAlpha)  / sizeof(renderAlpha[0])));
-    /* transitionTime     = random(4*60, 6*60); */
-		transitionTime     = 120;
+    transitionTime     = random(100, 5*30);
+		/* transitionTime     = 7*60; */
     fxVars[frontImgIdx][0] = 0; // Effect not yet initialized
     fxVars[2][0]           = 0; // Transition not yet initialized
   } else if(tCounter >= transitionTime) { // End transition
     fxIdx[backImgIdx] = fxIdx[frontImgIdx]; // Move front effect index to back
     backImgIdx        = 1 - backImgIdx;     // Invert back index
-    /* tCounter          = -3*60 - random(3*60); // Hold image 2 to 6 seconds */
-    tCounter          = -120;
+    tCounter          = -4*60 - random(6*60); // Hold image 2 to 6 seconds
+    /* tCounter          = -60*20; */
   }
 }
 
@@ -311,9 +314,9 @@ void renderEffectWavyFlag(byte idx) {
 
 void renderEffectRingFlow(byte idx) {
   long c;
-  int r, g, b, min_value = 125, min_sat = 150, hue_step = 5;
+  int r, g, b, min_value = 100, min_sat = 130, hue_step = 5;
   if(fxVars[idx][0] == 0) { // Initialize effect?
-    int step1 = 50 + random(250), step2 = random(150);
+    int step1 = 80 + random(380), step2 = 30 + random(220);
     fxVars[idx][1] = random(1536);   // c1 hue
     fxVars[idx][2] = fxVars[idx][1] + step1;   // c2 hue
     fxVars[idx][3] = fxVars[idx][1] + step2;   // c3 hue
@@ -517,6 +520,8 @@ void renderEffectStars(byte idx) {
     fxVars[idx][5] = 4 + random(10);   // hue speed
     fxVars[idx][6] = random(2);   // hue direction
 
+    fxVars[idx][7] = random(600) - 300;   // small star hue deviation
+
     fxVars[idx][0] = 1;   // Effect initialized
   }
 
@@ -532,8 +537,12 @@ void renderEffectStars(byte idx) {
 		setGroupColor(idx, imgData, starSmall, starSmallLength, r, g, b);
 	else if (fxVars[idx][1] == 1)
 		setGroupColor(idx, imgData, starMiddle, starMiddleLength, r, g, b);
-	else if (fxVars[idx][1] == 2)
+	else if (fxVars[idx][1] == 2) {
 		setGroupColor(idx, imgData, starBig, starBigLength, r, g, b);
+		c = hsv2rgb(fxVars[idx][2] + fxVars[idx][7], fxVars[idx][3], fxVars[idx][4]);
+		r = c >> 16, g = c >> 8, b = c;
+		setGroupColor(idx, imgData, starSmall, starSmallLength, r, g, b);
+	}
 }
 
 // TO DO: Add more effects here...Larson scanner, etc.
@@ -630,5 +639,90 @@ void renderAlphaSparkle(void) {
 	int i, r = (int)(t * (float)fxVars[2][1]);
 	for(i=0; i<numPixels; i++) {
 		alphaMask[i] = (int)(random(r) * t_inv) + (int)(t * 255);
+	}
+}
+
+void renderAlphaSwipe(void) {
+  if(fxVars[2][0] == 0) {
+		int i;
+		for(i=0; i<numPixels; i++) {
+			alphaMask[i] = 0;
+		}
+		fxVars[2][1] = random(2); // direction
+		fxVars[2][0] = 1;
+	}
+	float slot = 1./11.;
+	float t = (float)tCounter / (float)transitionTime;
+	if (fxVars[2][1] == 0) {
+		if (t < 4.*slot)
+			setGroupAlpha(alphaMask, line1, line1Length, t * 11./4. * 255);
+		if (t > slot && t < 5.*slot)
+			setGroupAlpha(alphaMask, line2, line2Length, (t * 11./4. - 0.25) * 255);
+		if (t > 2.*slot && t < 6.*slot)
+			setGroupAlpha(alphaMask, line3, line3Length, (t * 11./4. - 0.5) * 255);
+		if (t > 3.*slot && t < 7.*slot)
+			setGroupAlpha(alphaMask, line4, line4Length, (t * 11./4. - 0.75) * 255);
+		if (t > 4.*slot && t < 8.*slot)
+			setGroupAlpha(alphaMask, line5, line5Length, (t * 11./4. - 1.) * 255);
+		if (t > 5.*slot && t < 9.*slot)
+			setGroupAlpha(alphaMask, line6, line6Length, (t * 11./4. - 1.25) * 255);
+		if (t > 6.*slot && t < 10.*slot)
+			setGroupAlpha(alphaMask, line7, line7Length, (t * 11./4. - 1.5) * 255);
+		if (t > 7.*slot && t < 11.*slot)
+			setGroupAlpha(alphaMask, line8, line8Length, (t * 11./4. - 1.75) * 255);
+	}
+	else {
+		if (t < 4.*slot)
+			setGroupAlpha(alphaMask, line8, line8Length, t * 11./4. * 255);
+		if (t > slot && t < 5.*slot)
+			setGroupAlpha(alphaMask, line7, line7Length, (t * 11./4. - 0.25) * 255);
+		if (t > 2.*slot && t < 6.*slot)
+			setGroupAlpha(alphaMask, line6, line6Length, (t * 11./4. - 0.5) * 255);
+		if (t > 3.*slot && t < 7.*slot)
+			setGroupAlpha(alphaMask, line5, line5Length, (t * 11./4. - 0.75) * 255);
+		if (t > 4.*slot && t < 8.*slot)
+			setGroupAlpha(alphaMask, line4, line4Length, (t * 11./4. - 1.) * 255);
+		if (t > 5.*slot && t < 9.*slot)
+			setGroupAlpha(alphaMask, line3, line3Length, (t * 11./4. - 1.25) * 255);
+		if (t > 6.*slot && t < 10.*slot)
+			setGroupAlpha(alphaMask, line2, line2Length, (t * 11./4. - 1.5) * 255);
+		if (t > 7.*slot && t < 11.*slot)
+			setGroupAlpha(alphaMask, line1, line1Length, (t * 11./4. - 1.75) * 255);
+	}
+}
+
+void renderAlphaCentricSwipe(void) {
+  if(fxVars[2][0] == 0) {
+		int i;
+		for(i=0; i<numPixels; i++) {
+			alphaMask[i] = 0;
+		}
+		fxVars[2][1] = random(2); // direction
+		fxVars[2][0] = 1;
+	}
+	float slot = 1./7.;
+	float t = (float)tCounter / (float)transitionTime;
+	if (fxVars[2][1] == 0) {
+		if (t < 3.*slot)
+			setRangeAlpha(alphaMask, ring1, t * 7./3. * 255);
+		if (t > slot && t < 4.*slot)
+			setRangeAlpha(alphaMask, ring2, (t * 7./3. - 0.333) * 255);
+		if (t > 2.*slot && t < 5.*slot)
+			setRangeAlpha(alphaMask, ring3, (t * 7./3. - 0.667) * 255);
+		if (t > 3.*slot && t < 6.*slot)
+			setRangeAlpha(alphaMask, ring4, (t * 7./3. - 1.) * 255);
+		if (t > 4.*slot && t < 7.*slot)
+			setRangeAlpha(alphaMask, ring5, (t * 7./3. - 1.333) * 255);
+	} else {
+		if (t < 3.*slot)
+			setRangeAlpha(alphaMask, ring5, t * 7./3. * 255);
+		if (t > slot && t < 4.*slot)
+			setRangeAlpha(alphaMask, ring4, (t * 7./3. - 0.333) * 255);
+		if (t > 2.*slot && t < 5.*slot)
+			setRangeAlpha(alphaMask, ring3, (t * 7./3. - 0.667) * 255);
+		if (t > 3.*slot && t < 6.*slot)
+			setRangeAlpha(alphaMask, ring2, (t * 7./3. - 1.) * 255);
+		if (t > 4.*slot && t < 7.*slot)
+			setRangeAlpha(alphaMask, ring1, (t * 7./3. - 1.333) * 255);
 	}
 }
