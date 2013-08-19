@@ -47,28 +47,28 @@ static const uint8_t PROGMEM pent5[] = {47,48,49,75,76};
 static const uint8_t pent5Length = 5;
 
 // Lines
-static const uint8_t PROGMEM line1[] = {};
-static const uint8_t line1Length = ;
+static const uint8_t PROGMEM line1[] = {12,13,14,15,16};
+static const uint8_t line1Length = 5;
 
-static const uint8_t PROGMEM line[] = {};
-static const uint8_t lineLength = ;
+static const uint8_t PROGMEM line2[] = {10,11,42,43,44,45,46,47,48,17,18};
+static const uint8_t lineLength = 11;
 
-static const uint8_t PROGMEM line[] = {};
-static const uint8_t lineLength = ;
+static const uint8_t PROGMEM line3[] = {8,9,40,41,70,71,72,73,74,75,76,49,50,19,20};
+static const uint8_t lineLength = 15;
 
-static const uint8_t PROGMEM line[] = {};
-static const uint8_t lineLength = ;
+static const uint8_t PROGMEM line4[] = {6,7,38,29,68,69,91,92,93,94,95,77,78,51,52,21,22};
+static const uint8_t lineLength = 17;
 
-static const uint8_t PROGMEM line[] = {};
-static const uint8_t lineLength = ;
+static const uint8_t PROGMEM line5[] = {4,5,36,37,66,67,89,90,102,103,104,96,97,79,80,53,53,23,24};
+static const uint8_t lineLength = 19;
 
-static const uint8_t PROGMEM line[] = {};
-static const uint8_t lineLength = ;
+static const uint8_t PROGMEM line6[] = {2,3,34,35,65,64,88,87,101,100,99,98,82,81,55,56,25,26};
+static const uint8_t lineLength = 18;
 
-static const uint8_t PROGMEM line[] = {};
-static const uint8_t lineLength = ;
+static const uint8_t PROGMEM line7[] = {0,1,32,33,63,62,86,85,84,83,57,58,27,28};
+static const uint8_t lineLength = 14;
 
-static const uint8_t PROGMEM line[] = {};
-static const uint8_t lineLength = ;
+static const uint8_t PROGMEM line8[] = {31,61,30,29,59,60};
+static const uint8_t lineLength = 6;
 
 #endif
