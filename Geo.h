@@ -3,14 +3,14 @@
 
 #include <pgmspace.h>
 
-// Lines
-static const uint8_t PROGMEM firstCircle[] = {0, 29};
-static const uint8_t PROGMEM secondCircle[] = {30, 59};
-static const uint8_t PROGMEM thirdCircle[] = {60,84};
-static const uint8_t PROGMEM fourthCircle[] = {85,99};
-static const uint8_t PROGMEM fifthCircle[] = {100,104};
+// Rings
+static const uint8_t PROGMEM ring1[] = {0, 29};
+static const uint8_t PROGMEM ring2[] = {30, 59};
+static const uint8_t PROGMEM ring3[] = {60,84};
+static const uint8_t PROGMEM ring4[] = {85,99};
+static const uint8_t PROGMEM ring5[] = {100,104};
 
-// Groups
+// Stars
 static const uint8_t PROGMEM starSmall[] = {87,90,93,96,99,100,101,102,103,104};
 static const uint8_t starSmallLength = 10;
 
@@ -26,5 +26,49 @@ static const uint8_t PROGMEM starBig[] = {
 	100,101,102,103,104
 };
 static const uint8_t starBigLength = 85;
+
+// Pentagons
+static const uint8_t PROGMEM pentCenter[] = {100,101,102,103,104};
+static const uint8_t pentCenterLength = 5;
+
+static const uint8_t PROGMEM pent1[] = {41,42,43,70,71};
+static const uint8_t pent1Length = 5;
+
+static const uint8_t PROGMEM pent2[] = {35,36,37,65,66};
+static const uint8_t pent2Length = 5;
+
+static const uint8_t PROGMEM pent3[] = {30,31,59,60,61};
+static const uint8_t pent3Length = 5;
+
+static const uint8_t PROGMEM pent4[] = {53,54,55,80,81};
+static const uint8_t pent4Length = 5;
+
+static const uint8_t PROGMEM pent5[] = {47,48,49,75,76};
+static const uint8_t pent5Length = 5;
+
+// Lines
+static const uint8_t PROGMEM line1[] = {};
+static const uint8_t line1Length = ;
+
+static const uint8_t PROGMEM line[] = {};
+static const uint8_t lineLength = ;
+
+static const uint8_t PROGMEM line[] = {};
+static const uint8_t lineLength = ;
+
+static const uint8_t PROGMEM line[] = {};
+static const uint8_t lineLength = ;
+
+static const uint8_t PROGMEM line[] = {};
+static const uint8_t lineLength = ;
+
+static const uint8_t PROGMEM line[] = {};
+static const uint8_t lineLength = ;
+
+static const uint8_t PROGMEM line[] = {};
+static const uint8_t lineLength = ;
+
+static const uint8_t PROGMEM line[] = {};
+static const uint8_t lineLength = ;
 
 #endif
