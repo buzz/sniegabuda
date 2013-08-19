@@ -71,4 +71,22 @@ static const uint8_t lineLength = 14;
 static const uint8_t PROGMEM line8[] = {31,61,30,29,59,60};
 static const uint8_t lineLength = 6;
 
+// Leafs
+static const uint8_t PROGMEM leaf1[] = {29,30,31,59,84,60,61,62,99,85,86,87,100,101,104,103,102,93};
+static const uint8_t leaf1Length = 18;
+
+static const uint8_t PROGMEM leaf2[] = {23,53,54,55,79,80,81,82,96,97,98,99,104,100,103,102,101,90};
+static const uint8_t leaf2Length = 18;
+
+static const uint8_t PROGMEM leaf3[] = {17,49,48,47,77,76,75,74,96,95,94,93,104,103,100,101,102,87};
+static const uint8_t leaf3Length = 18;
+
+static const uint8_t PROGMEM leaf4[] = {11,43,42,41,72,71,70,69,93,92,91,90,103,102,104,100,101,99};
+static const uint8_t leaf4Length = 18;
+
+static const uint8_t PROGMEM leaf5[] = {96,103,104,100,102,101,90,89,88,87,67,66,65,64,37,36,35,5};
+static const uint8_t leaf5Length = 18;
+
+
+
 #endif
